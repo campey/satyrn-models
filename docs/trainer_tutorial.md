@@ -120,26 +120,11 @@ To watch GPU usage while training runs, open a second tmux window with `Ctrl+b c
 [nvtop](https://github.com/Syllo/nvtop) with `apt install -y nvtop && nvtop`, and switch between the windows with
 `Ctrl+b n`.
 
-You can also show the machine's uptime and CPU, RAM, GPU and VRAM usage in tmux's status bar. Uptime tells you roughly
-how long your run has taken, if the machine was started for it. Save a small stats script and add it to your tmux
-config before starting tmux:
+To see how long the machine has been running, and so roughly how long your run has taken, you can show the uptime in
+tmux's status bar. Add it to your tmux config before starting tmux:
 
 ```shell
-cat > ~/.tmux-stats.sh <<'EOF'
-#!/bin/sh
-cpu=$(vmstat 1 2 | awk 'END {print 100 - $15}')
-ram=$(free -g | awk '/^Mem:/ {print $3 "/" $2 "G"}')
-gpu=$(nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits |
-  awk -F', ' 'NR == 1 {printf "GPU %s%% VRAM %.0f/%.0fG", $1, $2 / 1024, $3 / 1024}')
-echo "Up $(uptime -p | sed 's/^up //') | CPU ${cpu}% RAM ${ram} | ${gpu}"
-EOF
-chmod +x ~/.tmux-stats.sh
-
-cat >> ~/.tmux.conf <<'EOF'
-set -g status-interval 5
-set -g status-right-length 120
-set -g status-right "#(~/.tmux-stats.sh) | %H:%M %Z"
-EOF
+echo "set -g status-right \"Uptime: #(uptime -p | sed 's/^up //') | %Y-%m-%d %H:%M %Z\"" >> ~/.tmux.conf
 ```
 
 If tmux is already running, load the change with `tmux source-file ~/.tmux.conf`.
