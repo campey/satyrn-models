@@ -91,23 +91,18 @@ hf download unsloth/Qwen3.8-27B
 
 ### Prepare the experiment command
 
-The dataset paths in the configs are relative to the repository root, so go back into the `satyrn-models` folder
-before you start training. Otherwise the run fails with a `FileNotFoundError` for a file such as
-`datasets/python3.14/cpt.jsonl`.
+To start fine-tuning, run the `satyrn-unsloth` command from the `satyrn-models` folder with the name of the
+experiment configuration you want to use:
 
 ```shell
 cd satyrn-models
+satyrn-unsloth --config-name experiment/py3.15-qwen3.8-27b
 ```
 
 > [!TIP]
-> If that error persists, check that the dataset files were downloaded with Git LFS. `head -c 150 datasets/python3.14/cpt.jsonl`
-> should print JSON rather than a `version https://git-lfs.github.com/spec/v1` pointer. If you see a pointer, run `git lfs pull`.
-
-To start fine-tuning, run the `satyrn-unsloth` command with the name of the experiment configuration you want to use:
-
-```shell
-satyrn-unsloth --config-name experiment/py3.15-qwen3.8-27b
-```
+> If the run fails with a `FileNotFoundError` for a dataset file, check that the dataset files were downloaded with Git LFS.
+> `head -c 150 datasets/python3.14/cpt.jsonl` should print JSON rather than a `version https://git-lfs.github.com/spec/v1`
+> pointer. If you see a pointer, run `git lfs pull`.
 
 #### Keep long runs alive with tmux
 
