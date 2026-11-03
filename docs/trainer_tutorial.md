@@ -61,6 +61,15 @@ export MLFLOW_TRACKING_USERNAME=
 export MLFLOW_TRACKING_PASSWORD=
 ```
 
+All four values are required, because the trainer checks for them before it starts.
+
+- `HF_USERNAME` is your Hugging Face username.
+- `HF_TOKEN` is a Hugging Face [access token](https://huggingface.co/settings/tokens). A **Read** token is enough to
+  download models. If you plan to upload your trained model with `push_to_hub=true`, create a **Write** token instead,
+  because the trainer creates and pushes to a model repo under your account.
+- `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD` are your credentials for the Satyrn MLflow server at
+  https://mlflow.satyrn.ai. Ask the Satyrn team on Discord for an account.
+
 ### Download the model
 
 Check out the [model config](https://github.com/satyrn-ai/satyrn-models/tree/main/trainer/unsloth/configs/model) of
@@ -82,11 +91,44 @@ hf download unsloth/Qwen3.8-27B
 
 ### Prepare the experiment command
 
+The dataset paths in the configs are relative to the repository root, so go back into the `satyrn-models` folder
+before you start training. Otherwise the run fails with a `FileNotFoundError` for a file such as
+`datasets/python3.14/cpt.jsonl`.
+
+```shell
+cd satyrn-models
+```
+
+> [!TIP]
+> If that error persists, check that the dataset files were downloaded with Git LFS. `head -c 150 datasets/python3.14/cpt.jsonl`
+> should print JSON rather than a `version https://git-lfs.github.com/spec/v1` pointer. If you see a pointer, run `git lfs pull`.
+
 To start fine-tuning, run the `satyrn-unsloth` command with the name of the experiment configuration you want to use:
 
 ```shell
 satyrn-unsloth --config-name experiment/py3.15-qwen3.8-27b
 ```
+
+#### Keep long runs alive with tmux
+
+A training run takes hours. A browser terminal, such as Molab's, is lost if you reload the page or navigate back by
+accident, and the run goes with it. Running the trainer inside [tmux](https://github.com/tmux/tmux/wiki) keeps it going,
+and you can reattach later with `tmux attach`.
+
+A new tmux session doesn't inherit the active Python virtual environment. Before starting tmux, find where the
+`satyrn-unsloth` command lives, so you can activate its environment inside tmux:
+
+```shell
+which satyrn-unsloth   # for example /tmp/uv-venv/bin/satyrn-unsloth on Molab
+tmux
+source /tmp/uv-venv/bin/activate
+cd satyrn-models
+satyrn-unsloth --config-name experiment/py3.15-qwen3.8-27b run_name=my-run
+```
+
+To watch GPU usage while training runs, open a second tmux window with `Ctrl+b c`, install and start
+[nvtop](https://github.com/Syllo/nvtop) with `apt install -y nvtop && nvtop`, and switch between the windows with
+`Ctrl+b n`.
 
 Pick one of the existing [experiment configs](https://github.com/satyrn-ai/satyrn-models/tree/main/trainer/unsloth/configs/experiment),
 or use the name of a new YAML file you added to `experiment` on your branch.
