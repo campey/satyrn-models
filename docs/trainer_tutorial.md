@@ -99,11 +99,6 @@ cd satyrn-models
 satyrn-unsloth --config-name experiment/py3.15-qwen3.8-27b
 ```
 
-> [!TIP]
-> If the run fails with a `FileNotFoundError` for a dataset file, check that the dataset files were downloaded with Git LFS.
-> `head -c 150 datasets/python3.14/cpt.jsonl` should print JSON rather than a `version https://git-lfs.github.com/spec/v1`
-> pointer. If you see a pointer, run `git lfs pull`.
-
 #### Keep long runs alive with tmux
 
 A training run takes hours. A browser terminal, such as Molab's, is lost if you reload the page or navigate back by
