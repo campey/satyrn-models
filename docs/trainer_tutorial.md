@@ -120,6 +120,15 @@ To watch GPU usage while training runs, open a second tmux window with `Ctrl+b c
 [nvtop](https://github.com/Syllo/nvtop) with `apt install -y nvtop && nvtop`, and switch between the windows with
 `Ctrl+b n`.
 
+To see how long the machine has been running, and so roughly how long your run has taken, you can show the uptime in
+tmux's status bar. Add it to your tmux config before starting tmux:
+
+```shell
+echo "set -g status-right \"Uptime: #(uptime -p | sed 's/^up //') | %Y-%m-%d %H:%M %Z\"" >> ~/.tmux.conf
+```
+
+If tmux is already running, load the change with `tmux source-file ~/.tmux.conf`.
+
 Pick one of the existing [experiment configs](https://github.com/satyrn-ai/satyrn-models/tree/main/trainer/unsloth/configs/experiment),
 or use the name of a new YAML file you added to `experiment` on your branch.
 
